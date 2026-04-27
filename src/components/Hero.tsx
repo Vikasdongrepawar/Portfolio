@@ -13,9 +13,9 @@ export default function Hero() {
         >
           <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-primary/20">
             <img 
-              src="/myimage-new.jpg" 
+              src={`${import.meta.env.BASE_URL}myimage-new.jpg`}
               alt="Vikas Dongre"
-              className="w-full h-full object-cover rounded-full opacity-40 hover:opacity-80 transition-opacity duration-700" 
+              className="w-full h-full object-cover rounded-full transition-opacity duration-700" 
             />
           </div>
           <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full border-2 border-black flex items-center justify-center">

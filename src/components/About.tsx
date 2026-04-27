@@ -21,7 +21,7 @@ export default function About() {
           <div className="inline-block relative">
             <div className="w-16 h-16 rounded-full overflow-hidden border border-white/10 mb-4">
                <img 
-                 src="/myimage-new.jpg" 
+                 src={`${import.meta.env.BASE_URL}myimage-new.jpg`}
                  alt="Vikas"
                  className="w-full h-full object-cover"
                />
