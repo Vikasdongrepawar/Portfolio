@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { GoogleGenAI } from "@google/genai";
 import { PROJECTS } from "../constants";
 
 type Message = {
@@ -58,18 +57,19 @@ export default function AIBot() {
     setIsLoading(true);
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey) throw new Error("API Key missing");
-
-      const ai = new GoogleGenAI({ apiKey });
-      const response = await ai.models.generateContent({
-        model: "gemini-flash-latest",
-        contents: [
-            { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\nUser Question: " + userMessage }] }
-        ],
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: SYSTEM_PROMPT + "\n\nUser Question: " + userMessage })
       });
 
-      const aiText = response.text || "I'm sorry, I couldn't process that.";
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch response from backend");
+      }
+
+      const aiText = data.text || "I'm sorry, I couldn't process that.";
       setMessages(prev => [...prev, { role: "assistant", content: aiText }]);
     } catch (error: any) {
       console.error("AI Error:", error);
