@@ -7,7 +7,7 @@ export default defineConfig(({mode}) => {
   return {
     // GitHub Pages serves static files from a sub-path (/{repo}/).
     // Using a relative base keeps asset URLs working without hardcoding the repo name.
-    base: './',
+    base: '/Portfolio/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
