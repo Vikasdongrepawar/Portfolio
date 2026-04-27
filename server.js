@@ -1,6 +1,7 @@
 import express from 'express';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -32,6 +33,38 @@ app.post('/api/chat', async (req, res) => {
   } catch (error) {
     console.error("AI Error:", error);
     return res.status(500).json({ error: error.message || "Unknown error occurred on the backend" });
+  }
+});
+
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      return res.status(500).json({ error: 'Email configuration is missing on the server.' });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER, // Send to yourself
+      replyTo: email,
+      subject: `Portfolio Contact: ${subject || 'New Message'}`,
+      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+    };
+
+    await transporter.sendMail(mailOptions);
+    return res.status(200).json({ success: true, message: 'Email sent successfully!' });
+  } catch (error) {
+    console.error("Email Error:", error);
+    return res.status(500).json({ error: "Failed to send email. Please try again later." });
   }
 });
 

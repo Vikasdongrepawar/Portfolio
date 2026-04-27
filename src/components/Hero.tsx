@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
+import MagneticWrapper from "./MagneticWrapper";
 
 export default function Hero() {
   return (
@@ -50,8 +51,12 @@ export default function Hero() {
           transition={{ delay: 0.3 }}
           className="flex items-center justify-center gap-8 mt-10"
         >
-          <Link to="/projects" className="sf-button-primary scale-110 px-8 py-3">View Projects</Link>
-          <Link to="/services" className="sf-button-secondary scale-110">Learn more {'>'}</Link>
+          <MagneticWrapper>
+            <Link to="/projects" className="sf-button-primary scale-110 px-8 py-3 block">View Projects</Link>
+          </MagneticWrapper>
+          <MagneticWrapper>
+            <Link to="/services" className="sf-button-secondary scale-110 block">Learn more {'>'}</Link>
+          </MagneticWrapper>
         </motion.div>
       </div>
 

@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import React, { useState } from "react";
+import MagneticWrapper from "./MagneticWrapper";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -9,12 +10,36 @@ export default function Contact() {
     message: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const mailtoUrl = `mailto:vikasdongre952@gmail.com?subject=${encodeURIComponent(formData.subject || "Project Inquiry")}&body=${encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-    )}`;
-    window.location.href = mailtoUrl;
+    setStatus("loading");
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send message");
+      }
+
+      setStatus("success");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => setStatus("idle"), 5000);
+    } catch (error: any) {
+      setStatus("error");
+      setErrorMessage(error.message || "An unexpected error occurred");
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -91,16 +116,33 @@ export default function Contact() {
               ></textarea>
             </div>
 
-            <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-6">
-              <p className="text-[13px] text-[#86868b] max-w-xs text-center md:text-left">
-                By clicking "Send Message", your default email client will open with the details pre-filled.
-              </p>
-              <button 
-                type="submit"
-                className="sf-button-primary w-full md:w-auto px-12 py-4 scale-110 active:scale-95 transition-transform"
-              >
-                Get in Touch
-              </button>
+            <div className="pt-4 flex flex-col items-center justify-center gap-6">
+              {status === "success" && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-green-400 text-sm font-medium">
+                  Message sent successfully! I'll get back to you soon.
+                </motion.div>
+              )}
+              {status === "error" && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-400 text-sm font-medium">
+                  {errorMessage}
+                </motion.div>
+              )}
+              <MagneticWrapper>
+                <button 
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="sf-button-primary w-full md:w-auto px-12 py-4 scale-110 active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-110 flex items-center justify-center gap-2"
+                >
+                  {status === "loading" ? (
+                    <>
+                      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Get in Touch"
+                  )}
+                </button>
+              </MagneticWrapper>
             </div>
           </form>
         </motion.div>

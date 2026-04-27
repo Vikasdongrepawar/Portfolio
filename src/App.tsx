@@ -5,7 +5,7 @@
 
 import { HashRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { useLayoutEffect, ReactNode } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useScroll, useSpring } from "motion/react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -15,6 +15,7 @@ import Contact from "./components/Contact";
 import AIBot from "./components/AIBot";
 import Footer from "./components/Footer";
 import SupernovaCaseStudy from "./components/SupernovaCaseStudy";
+import CustomCursor from "./components/CustomCursor";
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -74,10 +75,22 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
   return (
     <Router>
       <ScrollToTop />
-      <div className="min-h-screen flex flex-col">
+      <CustomCursor />
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-primary origin-left z-[9999]"
+        style={{ scaleX }}
+      />
+      <div className="min-h-screen flex flex-col cursor-none">
         <Navbar />
         <main className="flex-grow">
           <AnimatedRoutes />
